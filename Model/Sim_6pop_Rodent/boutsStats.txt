@@ -1,0 +1,16 @@
+            Df Sum Sq Mean Sq F value Pr(>F)    
+ind          2  6.067  3.0333      91  1e-12 ***
+Residuals   27  0.900  0.0333                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = values ~ ind, data = ABouts)
+
+$ind
+          diff        lwr       upr     p adj
+REM-NREM  -0.1 -0.3024436 0.1024436 0.4492381
+wake-NREM  0.9  0.6975564 1.1024436 0.0000000
+wake-REM   1.0  0.7975564 1.2024436 0.0000000
+
