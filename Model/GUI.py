@@ -22,20 +22,11 @@ class NetworkGUI:
 
     #---------------Display Compartement Parameters-----------------------
     def displayCompParam(self,window):
-
         i = 0
         objFrame = Frame (window)
         for comp in self.compartments.values():
             i += 1
             self.getCompartmentFrame(comp,objFrame).grid(column=i, row=0)
-
-
-
-
-
-
-
-
         return objFrame
 
     def getCompartmentFrame(self, comp, frame):
