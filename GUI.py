@@ -30,12 +30,6 @@ class NetworkGUI:
             self.getCompartmentFrame(comp,objFrame).grid(column=i, row=0)
 
 
-
-
-
-
-
-
         return objFrame
 
     def getCompartmentFrame(self, comp, frame):
