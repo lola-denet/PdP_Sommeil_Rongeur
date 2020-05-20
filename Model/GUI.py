@@ -10,6 +10,7 @@
 #Calculation
 import numpy as np ### not necessary
 #Gaphical interface
+import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
 #Graph generation
@@ -21,16 +22,33 @@ import os
 class NetworkGUI:
 
     #---------------Display Compartement Parameters-----------------------
-    def displayCompParam(self,window):
 
+    def displayCompParam(self, windowTemp):
+        window = windowTemp
+        widthScreen = window.winfo_screenwidth()
+        heightScreen = window.winfo_screenheight()
+
+        # Canvas creation
+
+        container = ttk.Frame(window, relief=tk.SUNKEN)
+        canvas = tk.Canvas(container, width=widthScreen*0.9, height=heightScreen*0.9, bg='white')
+        scrollbar = ttk.Scrollbar(container, orient="horizontal", command=canvas.xview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(xscrollcommand=scrollbar.set)
         i = 0
-        objFrame = Frame (window)
         for comp in self.compartments.values():
-            i += 1
-            self.getCompartmentFrame(comp,objFrame).grid(column=i, row=0)
+            i += 10
+            frame = self.getCompartmentFrame(comp, scrollable_frame)
+            frame.grid(column=i, row=0)
+            canvas.create_window(0, 0)
 
-
-        return objFrame
+        container.grid()
+        canvas.grid(column=0,row=2, rowspan=2)
+        scrollbar.grid(column=0,row=1,sticky='we')
+        window.mainloop()
 
     def getCompartmentFrame(self, comp, frame):
 

@@ -71,25 +71,27 @@ def doStats():
 
 window = tk.Tk()
 window.title("SR sim")
-window.geometry()
+widthScreen = window.winfo_screenwidth()
+heightScreen = window.winfo_screenheight()
+window.geometry("{}x{}".format(int(widthScreen), int(heightScreen)))
 
-n = ttk.Notebook(window)   # Creation of tab system
+n = ttk.Notebook(window,width = int(widthScreen), height = int(heightScreen))   # Creation of tab system
 n.pack()
 
-mainMenu = ttk.Frame(n)       # Add main tab
-mainMenu.pack()
+mainMenu = ttk.Frame(n,relief = tk.SUNKEN)       # Add main tab
+mainMenu.pack(fill="both")
 
-paramMenu = ttk.Frame(n)       # Add parameters tab
-paramMenu.pack()
+paramMenu = ttk.Frame(n,relief = tk.SUNKEN)       # Add parameters tab
+paramMenu.pack(fill="both", expand=True)
 
-runMenu = ttk.Frame(n)       # Add run tab
-runMenu.pack()
+runMenu = ttk.Frame(n,relief = tk.SUNKEN)       # Add run tab
+runMenu.pack(fill="both")
 
-visuMenu = ttk.Frame(n)       # Add visualization tab
-visuMenu.pack()
+visuMenu = ttk.Frame(n,relief = tk.SUNKEN)       # Add visualization tab
+visuMenu.pack(fill="both")
 
-statMenu = ttk.Frame(n)       # Add statistics tab
-statMenu.pack()
+statMenu = ttk.Frame(n,relief = tk.SUNKEN)       # Add statistics tab
+statMenu.pack(fill="both")
 
 n.add(mainMenu, text='Main')
 n.add(paramMenu, text='Parameters')
@@ -119,7 +121,7 @@ b.grid(column=0, row=3)
 
 #--------------Param menu widgets-------------------
 
-b = tk.Button(paramMenu, text="Display Compartments Parameters", command=lambda: network.displayCompParam(paramMenu).grid(column=0, row=1),width=25)
+b = tk.Button(paramMenu, text="Display Compartments Parameters", command=lambda: network.displayCompParam(paramMenu))
 b.grid(column=0, row=0)
 
 b = tk.Button(paramMenu, text="Add Object to Network", command=lambda: network.addObjToModel(network),width=25)
