@@ -25,17 +25,21 @@ def loadModel():
     global network
 
 
-    pop,cycle,sim,conn=read_parameters(filedialog.askopenfilename(initialdir = os.getcwd(),title = "Select file",filetypes = (("text files","*.txt"),("all files","*.*"))))
+    pop,cycle,sim,conn,inj=read_parameters(filedialog.askopenfilename(initialdir = os.getcwd(),title = "Select file",filetypes = (("text files","*.txt"),("all files","*.*"))))
     network = Network(sim)   
 
     for key in pop.keys():
         network.addNP(pop[key])
     print("### Neuronal Populations OK ###\n")
-
+    
     for key in cycle.keys():
         network.addHSD(cycle[key])
     print("### Homeostatic Sleep Drive OK ###\n")
 
+    for key in inj.keys():
+        network.addINJ(inj[key])
+    print("### Microinjections OK ###\n")
+    
     for pop_ext in conn.keys() :
         i = 0
         for pop_source in conn[pop_ext] :
@@ -47,7 +51,7 @@ def loadModel():
                 network.addNPConnection("NP-NP",pop_source,pop_ext,pop[pop_ext]["g_NT_pop_list"][i])
             i+=1
     print("### Connections OK ###\n")
-
+    
     network.getSimParamFrame(runMenu).grid(column = 0, row = 1)
 
 
@@ -95,8 +99,7 @@ n.add(statMenu, text='Statistics')
 
 #-----------Main menu widgets---------------
 
-b = tk.Button(mainMenu, text="Load model", command=lambda: loadModel(),width=25)
-b.grid(column=0, row=0)
+tk.Button(mainMenu, text="Load model", command=lambda:loadModel(),width=25).grid(column=0, row=0)
 
 b = tk.Button(mainMenu, text="Display network", command=lambda: network.displayGraph(),width=25)
 b.grid(column=0, row=1)
@@ -125,7 +128,7 @@ b.grid(column=0, row=4)
 b = tk.Button(paramMenu, text="Save Parameters", command=lambda: write_parameters(filedialog.asksaveasfile(title="Save as", initialdir=os.getcwd(), mode="w", defaultextension=".txt"),network))
 b.grid(column=0, row = 6)
 
-b = tk.Button(paramMenu, text="Add injection", command=lambda: network.getInjectionCreationWindow())
+b = tk.Button(paramMenu, text="Add injection", command=lambda:network.getInjectionCreationWindow())
 b.grid(column=0, row = 7)
 
 #--------------Run menu widgets-------------------

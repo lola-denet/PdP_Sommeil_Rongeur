@@ -22,11 +22,14 @@ class NetworkGUI:
 
     #---------------Display Compartement Parameters-----------------------
     def displayCompParam(self,window):
+
         i = 0
         objFrame = Frame (window)
         for comp in self.compartments.values():
             i += 1
             self.getCompartmentFrame(comp,objFrame).grid(column=i, row=0)
+
+
         return objFrame
 
     def getCompartmentFrame(self, comp, frame):
@@ -408,64 +411,120 @@ class NetworkGUI:
     def getInjectionCreationWindow(self):
 
         window = Tk()
-
-
+       
         connAvailable = []
         connAvailableStr = []
         connStr = StringVar()
-        injType = StringVar()
-
-        optType = ["Agonist", "Antagonist"]
+        
 
         def changeConn(new):
-
             connStr = new
             print(connStr, "type", type(connStr))
 
-        def changeInjType(new):
-            injType = new
-            print(injType)
-
-        def getConnObject(name):
-            print("return:::", connAvailable[connAvailableStr.index(name)], "type", type(connAvailable[connAvailableStr.index(name)]))
-            return connAvailable[connAvailableStr.index(name)]
-
-
-        for c in self.compartments.values():
-            for i in c.connections:
-                if i.type == "NP-NP":
-                    connAvailableStr.append("Injection of: "+str(i.source.neurotransmitter)+" in "+str(i.target.name))
-                    connAvailable.append(i)
+        
+    
+        
+        print(self.compartments)
+        for c in self.compartments.keys():
+            if c != 'GABA_VLPO' and c != 'acetylcholin_WR':
+                for i in self.compartments[c].connections:
+                    if i.type == "NP-NP":
+                        connAvailableStr.append("Injection of: "+str(i.source.neurotransmitter)+" in "+str(i.target.name))
+                        connAvailable.append(i)
 
 
-        lbl = Label(window, text="Select Injection").grid(column=0, row=0)
-        optMenu = OptionMenu(window, connStr, *connAvailableStr, command=changeConn).grid(column=1, row=0)
+        
+        
+        def getName(name):
+            top = Toplevel()  
+            top.title('Python')  
+            print(name)
+            a = name[14:]
+            i = a.index(" ")
+            neuro = a[:i]
+            # print(a[:i])
+            print(neuro)
+            
+            injType = StringVar()
+            optType = ["Agonist", "Antagonist"]
+            
+            def changeInjType(new):
+                injType = new
+                print(injType)
+    
+            def getConnObject(name):
+                print("return:::", connAvailable[connAvailableStr.index(name)], "type", type(connAvailable[connAvailableStr.index(name)]))
+                return connAvailable[connAvailableStr.index(name)]
+            
+            lbl = Label(top, text="Select type").grid(column=0, row=0)
+            optMenu = OptionMenu(top, injType, *optType, command=changeInjType).grid(column=1, row=0)
+            print(injType.get())
+        
+            lbl = Label(top, text="P0").grid(column=0, row=1)  
+            e1 = Entry(top)
+            e1.insert(END, self.compartments[neuro].agoniste)
+            e1.grid(column=1, row=1)
+           
+            lbl = Label(top, text="Q0").grid(column=0, row=2)  
+            e5 = Entry(top)
+            e5.insert(END, self.compartments[neuro].antagoniste)
+            e5.grid(column=1, row=2)
+    
+            lbl = Label(top, text="TauInj").grid(column=0, row=3)
+            e2 = Entry(top)
+            e2.insert(END, 10000)
+            e2.grid(column=1, row=3)
+    
+            lbl = Label(top, text="iMin").grid(column=0, row=4)
+            e3 = Entry(top)
+            e3.insert(END, self.compartments[neuro].imin)
+            e3.grid(column=1, row=4)
+    
+            lbl = Label(top, text="iMax").grid(column=0, row=5)
+            e4 = Entry(top)
+            e4.insert(END, self.compartments[neuro].imax)
+            e4.grid(column=1, row=5)
 
-        lbl = Label(window, text="P0").grid(column=0, row=1)
-        e1 = Entry(window)
-        e1.grid(column=1, row=1)
 
-        lbl = Label(window, text="TauInj").grid(column=0, row=2)
-        e2 = Entry(window)
-        e2.grid(column=1, row=2)
+            b = Button(top, text="Create", command=lambda: self.addInjection(injType.get(), getConnObject(name), e1.get(), e2.get(), e3.get(), e4.get(), e5.get()),width=25).grid(column=0, row=6)
+        
+        lbl = Label(window, text="Select Injection").grid(column=0, row=1)
+        optMenu = OptionMenu(window, connStr, *connAvailableStr, command=changeConn).grid(column=1, row=1)
 
-        lbl = Label(window, text="iMin").grid(column=0, row=3)
-        e3 = Entry(window)
-        e3.grid(column=1, row=3)
+        Button(window, text="Create", command=lambda :getName(connStr.get()),width=25).grid(column=1, row=2)
+   
+        # lbl = Label(window, text="P0").grid(column=0, row=4)  
+        # e1 = Entry(window)
+        # e1.insert(END, self.compartments[getName(connStr.get())].agoniste)
+        # e1.grid(column=1, row=4)
+       
+        # lbl = Label(window, text="Q0").grid(column=0, row=5)  
+        # e5 = Entry(window)
+        # e5.insert(END, 0)
+        # e5.grid(column=1, row=5)
 
-        lbl = Label(window, text="iMax").grid(column=0, row=4)
-        e4 = Entry(window)
-        e4.grid(column=1, row=4)
+        # lbl = Label(window, text="TauInj").grid(column=0, row=6)
+        # e2 = Entry(window)
+        # e2.insert(END, 10000)
+        # e2.grid(column=1, row=6)
 
-        lbl = Label(window, text="Select Injection").grid(column=0, row=5)
-        optMenu = OptionMenu(window, injType, *optType, command=changeInjType).grid(column=1, row=5)
+        # lbl = Label(window, text="iMin").grid(column=0, row=5)
+        # e3 = Entry(window)
+        # e3.insert(END, 0.3)
+        # e3.grid(column=1, row=5)
 
-        print(e1.get())
-        print(e2.get())
-        print(e3.get())
-        print(e4.get())
+        # lbl = Label(window, text="iMax").grid(column=0, row=7)
+        # e4 = Entry(window)
+        # e4.insert(END, 2.5)
+        # e4.grid(column=1, row=7)
 
-        b = Button(window, text="Create", command=lambda: self.addInjection(getConnObject(connStr.get()), e1.get(), e2.get(), e3.get(), e4.get(), injType.get() ),width=25).grid(column=0, row=6)
+
+        # print(e1.get())
+        # print(e5.get())
+        # print(e2.get())
+        # print(e3.get())
+        # print(e4.get())
+
 
         window.mainloop()
 

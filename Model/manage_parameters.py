@@ -11,6 +11,7 @@ def read_parameters(file) :
     populations = {}
     cycles = {}
     simulation_parameters = {}
+    microinjections = {}
 
     connections = {}
 
@@ -18,7 +19,8 @@ def read_parameters(file) :
     check_pop = 0   # check whether you're currently in a population block
     check_cycle = 0   # check whether you're currently in a cycle block
     check_sim = 0   # check whether you're currently in a simulation definition block
-
+    check_inj = 0
+    
     for lines in content :
         line = lines.split(" ")
         if len(line) != 0 and line[0] != "//" and line[0] != '' :
@@ -40,6 +42,14 @@ def read_parameters(file) :
                 check_sim = 1
             elif line[0] == "#" and check_sim == 1 :
                 check_sim = 0
+                
+            elif line[0] == "&" and check_inj == 0 :
+                check_inj = 1
+                currentTransmitter = line[3]
+                microinjections[currentTransmitter] = {}
+                microinjections[currentTransmitter]["name"] = currentTransmitter
+            elif line[0] == "&" and check_inj == 1 :
+                check_inj = 0
 
             elif (check_pop == 1 and line[0] != "*") :
                 if line[0] == "g_NT_pop_list" or line[0] == "pop_list" or line[0] == "beta" :
@@ -51,6 +61,7 @@ def read_parameters(file) :
                     populations[currentPopulation][line[0]] = line[2]
                 if line[0] == "pop_list" :
                     connections[currentPopulation] = myParameter
+                    
             elif check_cycle == 1 and line[0] != "+" :
                 if line[0] == "g_NT_pop_list" or line[0] == "pop_list" :
                     myParameter = []
@@ -61,12 +72,17 @@ def read_parameters(file) :
                     cycles[currentCycle][line[0]] = line[2]
                 if line[0] == "pop_list" :
                     connections[currentCycle] = myParameter
+                    
             elif check_sim == 1 and line[0] != "#" :
                 simulation_parameters[line[0]] = line[2]
 
+            elif check_inj == 1 and line[0] != "&" :
+                microinjections[currentTransmitter][line[0]] = line[2]
+                
     fic.close()
-    return populations,cycles,simulation_parameters,connections
+    return populations,cycles,simulation_parameters,connections,microinjections
 
+#print(read_parameters("6pop_injections.txt")[4])
 
 def write_parameters(name_file,network) :
     ### writes a file with the input parameters
@@ -79,3 +95,4 @@ def write_parameters(name_file,network) :
     name_file.close()
 
     print("Parameters have been saved under",name_file.name)
+    

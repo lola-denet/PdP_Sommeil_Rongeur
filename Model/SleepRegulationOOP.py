@@ -23,7 +23,8 @@ class Network(NetworkGUI):
         self.compartments  = {} #Ditionnary containing all the compartments objects
         self.results = []  #Data storage
         self.headers = [] # Data storage
-        self.injections = [] #injection storage
+        self.injections = []#injection storage
+        
 
         #Simulation parameters
         self.step = None # Used to store the number of time steps done
@@ -51,7 +52,8 @@ class Network(NetworkGUI):
             self.t = 0
             self.mean = float(args[0]["mean"])
             self.std = float(args[0]["std"])
-
+       
+    
     #-----------------------------------Noise-----------------------------------#
 
     def additiveWhiteGaussianNoise(self): #Returns white noise from a Gaussian distribution
@@ -94,11 +96,11 @@ class Network(NetworkGUI):
 
 
     def nextStepEuler(self): #call Euler next step method in each compartments
-        for c in self.compartments .values():
-            if isinstance(c,NeuronalPopulation):
+        for c in self.compartments.values():
+            if isinstance(c, NeuronalPopulation):
                 noise = self.additiveWhiteGaussianNoise()
                 c.setNextStepEuler(self.dt, 0, noise)
-            else:
+            elif isinstance(c, HomeostaticSleepDrive):
                 c.setNextStepEuler(self.dt, 0)
 
     def nextStepRK4(self): #call RK4 next step method in each compartments
@@ -165,10 +167,13 @@ class Network(NetworkGUI):
         for header in self.recorder():
             self.results.append([header])
             self.headers.append(header)
-        for c in self.compartments.values():
-            for header in c.recorder():
-                self.results.append([header])
-                self.headers.append(header)
+        for c in self.compartments.keys():
+            if c != 'GABA_VLPO' and c != 'acetylcholin_WR':
+                for header in self.compartments[c].recorder():
+        # for c in self.compartments.values():
+            # for header in c.recorder():
+                    self.results.append([header])
+                    self.headers.append(header)
 
     def getAndSaveRecorders(self): #Call the recorders in each compartements
         i=0
@@ -176,10 +181,13 @@ class Network(NetworkGUI):
             if var in self.recorder().keys() :
                 self.results[i].append(self.recorder()[var])
                 i+=1
-            for c in self.compartments.values():
-                if var in c.recorder().keys() :
-                    self.results[i].append(c.recorder()[var])
-                    i+=1
+            for c in self.compartments.keys():
+                if c != 'GABA_VLPO' and c != 'acetylcholin_WR':
+                    if var in self.compartments[c].recorder().keys() :
+            # for c in self.compartments.values():
+            #     if var in c.recorder().keys() :
+                        self.results[i].append(self.compartments[c].recorder()[var])
+                        i+=1
 
     def recorder(self):
         return {'time': self.t, 'hypnogram': self.getHypno()}
@@ -194,15 +202,18 @@ class Network(NetworkGUI):
     def addHSD(self, cycleParam): #Add an instance of HomeostaticSleepDrive to the compartments dictionnary
         self.compartments ['HSD'] = HomeostaticSleepDrive(cycleParam)
 
+    def addINJ(self, injParam):
+        self.compartments [injParam["name"]] = MicroInjection(injParam)
+        
     def addNPConnection(self, type, sourceName, targetName, weight): #Add a connection object to the concerned compartment
         self.compartments [targetName].connections.append(Connection(type, self.compartments [sourceName],self.compartments [targetName],weight))
 
-    def addInjection(self, connection, P0, TauInj, iMin, iMax, type ):
+    def addInjection(self, type, connection, P0, TauInj, iMin, iMax, Q0):
         if type == "Agonist":
             connection.addInjE(Injection(P0, TauInj, iMin, iMax))
             self.injections.append(connection.inj)
         if type == "Antagonist":
-            connection.addInjE(Injection(P0, TauInj, iMin, iMax))
+            connection.addInjI(Injection(Q0, TauInj, iMin, iMax))
             self.injections.append(connection.inj)
 
     #-------------------------------Debugging methods----------------------------------#
@@ -228,6 +239,17 @@ class Network(NetworkGUI):
 
 
 
+
+class MicroInjection :
+    
+    def __init__(self, myInjection) :
+        self.name = myInjection["name"]
+        self.agoniste = myInjection["agoniste"]
+        self.antagoniste = myInjection["antagoniste"]
+        self.imin = myInjection["imin"]
+        self.imax = myInjection["imax"]
+        
+        
 ########################NeuronalPopulation ############################
 #Class representing a neuronal population                             #
 #######################################################################
@@ -241,7 +263,6 @@ class NeuronalPopulation :
     def __init__(self,myPopulation) :
         self.name = myPopulation["name"]
         self.promoting = myPopulation["promoting"] #
-
         #List of 'Connection' objects
 
 
@@ -498,8 +519,7 @@ class Injection:
         self.tauPi = tauPi #Au
         self.iMin = iMin #Au
         self.imax = iMax #Au
-
-
+        
     def getP(self,N):
         return -(self.P[N]/self.tauPi)
 
