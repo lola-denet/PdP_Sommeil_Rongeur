@@ -113,9 +113,37 @@ imin = 0.3
 imax = 2.5
 &
 
+& neurotransmitter = GABA_SCN
+agoniste = 2
+antagoniste = 1
+imin = 0.3
+imax = 2.5
+&
+
 & neurotransmitter = acetylcholin_WR
 agoniste = 0.8
 antagoniste = 0.55
 imin = 0.3
 imax = 2.0
+&
+
+& neurotransmitter = acetylcholin_R
+agoniste = 0.8
+antagoniste = 0.55
+imin = 0.3
+imax = 2.0
+&
+
+& neurotransmitter = noradrenaline_LC
+agoniste = 
+antagoniste = 
+imin = 
+imax = 
+&
+
+& neurotransmitter = serotonin_DR
+agoniste = 
+antagoniste = 
+imin = 
+imax = 
 &

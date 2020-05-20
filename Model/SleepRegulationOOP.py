@@ -53,6 +53,7 @@ class Network(NetworkGUI):
             self.mean = float(args[0]["mean"])
             self.std = float(args[0]["std"])
        
+        self.nlist = ['GABA_VLPO', 'GABA_SCN', 'acetylcholin_WR', 'acetylcholin_R', 'noradrenaline_LC', 'serotonin_DR']
     
     #-----------------------------------Noise-----------------------------------#
 
@@ -162,13 +163,14 @@ class Network(NetworkGUI):
         filename.close()
 
     #-----------------------------Recorders--------------------------------------#
-
+    
     def initResults(self): #Set the correct number of Sublist in self.results in function of the number of variable to be saved
         for header in self.recorder():
             self.results.append([header])
             self.headers.append(header)
+        
         for c in self.compartments.keys():
-            if c != 'GABA_VLPO' and c != 'acetylcholin_WR':
+            if c not in self.nlist:
                 for header in self.compartments[c].recorder():
         # for c in self.compartments.values():
             # for header in c.recorder():
@@ -182,7 +184,7 @@ class Network(NetworkGUI):
                 self.results[i].append(self.recorder()[var])
                 i+=1
             for c in self.compartments.keys():
-                if c != 'GABA_VLPO' and c != 'acetylcholin_WR':
+                if c not in self.nlist:
                     if var in self.compartments[c].recorder().keys() :
             # for c in self.compartments.values():
             #     if var in c.recorder().keys() :
@@ -223,9 +225,11 @@ class Network(NetworkGUI):
             print(attr," ",value," ",type(value))
 
     def displayConnections(self): #Print all connections wich are in a compartment informations
-        for attr, value in self.compartments .items():
-            for conn in value.connections:
-                print("Connection type: ",conn.type,"  ",conn.source.name,"--",conn.weight,"-->",conn.target.name)
+        for attr, value in self.compartments.items():
+            if attr not in self.nlist:
+                for conn in value.connections:                        
+            # for conn in value.connections:
+                    print("Connection type: ",conn.type,"  ",conn.source.name,"--",conn.weight,"-->",conn.target.name)
 
     #-----------------------------Save parameters------------------------------------#
 

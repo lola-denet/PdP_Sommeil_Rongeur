@@ -22,7 +22,6 @@ import os
 class NetworkGUI:
 
     #---------------Display Compartement Parameters-----------------------
-
     def displayCompParam(self, windowTemp):
         window = windowTemp
         widthScreen = window.winfo_screenwidth()
@@ -442,9 +441,9 @@ class NetworkGUI:
         
     
         
-        print(self.compartments)
+        #print(self.compartments)
         for c in self.compartments.keys():
-            if c != 'GABA_VLPO' and c != 'acetylcholin_WR':
+            if c not in self.nlist:
                 for i in self.compartments[c].connections:
                     if i.type == "NP-NP":
                         connAvailableStr.append("Injection of: "+str(i.source.neurotransmitter)+" in "+str(i.target.name))
@@ -553,10 +552,14 @@ class NetworkGUI:
         dot = Digraph()
 
         for cName in self.compartments .keys():
-            dot.node(str(cName),str(cName))
-
-        for cObj in self.compartments .values():
-            for conn in cObj.connections:
+            if cName not in self.nlist:
+                dot.node(str(cName),str(cName))
+        
+        for c in self.compartments.keys():
+            if c not in self.nlist:
+                for conn in self.compartments[c].connections:
+        # for cObj in self.compartments.values():
+        #     for conn in cObj.connections:
                     if conn.weight < 0:
                         dot.edge(str(conn.source.name),str(conn.target.name), constraint='true',directed='false',arrowhead='tee')
                     if conn.weight >= 0:
