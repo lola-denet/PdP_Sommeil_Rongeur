@@ -428,20 +428,17 @@ class NetworkGUI:
 
     def getInjectionCreationWindow(self):
 
-        window = Tk()
+        window = Toplevel()
+        window.title('Type of injection')
        
         connAvailable = []
         connAvailableStr = []
         connStr = StringVar()
-        
-
+    
         def changeConn(new):
             connStr = new
             print(connStr, "type", type(connStr))
 
-        
-    
-        
         print(self.compartments)
         for c in self.compartments.keys():
             if c != 'GABA_VLPO' and c != 'acetylcholin_WR':
@@ -450,12 +447,9 @@ class NetworkGUI:
                         connAvailableStr.append("Injection of: "+str(i.source.neurotransmitter)+" in "+str(i.target.name))
                         connAvailable.append(i)
 
-
-        
-        
         def getName(name):
             top = Toplevel()  
-            top.title('Python')  
+            top.title('Injection parameters')  
             print(name)
             a = name[14:]
             i = a.index(" ")
