@@ -199,7 +199,7 @@ def createGraph(data,neurotransmitters,option=0):
     
     plt.figure(1, figsize=(13, 8))
     plt.gcf().subplots_adjust(left = 0.08, right = 0.8, hspace = 0.4)
-    
+
     ### subplot 1 - firing rates
     if 'F' in to_display :
         ax=plt.subplot(3,1,1)
@@ -221,6 +221,7 @@ def createGraph(data,neurotransmitters,option=0):
                     sub1=plt.fill_between(data['time'],values,data['firing rates'][fr],color=colors[fr],alpha=0.25)
         xticks(time_ms,time_h)
         plt.ylabel('Activity (Hz)')
+        plt.title('Firing rates ~ Time', fontsize=12, fontweight='bold')
         chartBox = ax.get_position()
         ax.set_position([chartBox.x0, chartBox.y0, chartBox.width, chartBox.height])
         ax.legend(loc='upper center', bbox_to_anchor=((chartBox.width+0.34), (chartBox.height+0.85)), shadow=True, ncol=1)
@@ -251,6 +252,7 @@ def createGraph(data,neurotransmitters,option=0):
                     sub2=plt.fill_between(data['time'],values,data['concentrations'][c],color=colors[c],alpha=0.25)
 
         plt.ylabel("Concentrations (aU)")
+        plt.title('Neurotransmitter concentrations ~ Time', fontsize=12, fontweight='bold')
         chartBox = ax.get_position()
         ax.set_position([chartBox.x0, chartBox.y0, chartBox.width, chartBox.height])
         ax.legend(loc='upper center', bbox_to_anchor=((chartBox.width+0.38), (chartBox.height+0.85)), shadow=True, ncol=1)
@@ -268,6 +270,7 @@ def createGraph(data,neurotransmitters,option=0):
         else : 
             plt.xlabel('Time (h)')
         plt.ylabel('Hypnogram')
+        plt.title('Hypnogram ~ Time', fontsize=12, fontweight='bold')
 
     if option != "control" :
         plt.show()
