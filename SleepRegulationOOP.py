@@ -106,8 +106,10 @@ class Network(NetworkGUI):
 
     def nextStepRK4(self): #call RK4 next step method in each compartments
         for N in range(4):
-            for c in self.compartments.values():
-                c.setNextSubStepRK4(self.dt,N,self.A[N])
+            for c in self.compartments.keys():
+                if c not in self.nlist:
+            # for c in self.compartments.values():
+                    self.compartments[c].setNextSubStepRK4(self.dt,N,self.A[N])
             for i in self.injections:
                 i.setNextSubStepRK4(self.dt,N,self.A[N])
 
@@ -115,6 +117,8 @@ class Network(NetworkGUI):
             if isinstance(c,NeuronalPopulation):
                 noise = self.additiveWhiteGaussianNoise()
                 c.setNextStepRK4(noise)
+            elif isinstance(c,ParaInjections):
+                pass
             else:
                 c.setNextStepRK4()
 
