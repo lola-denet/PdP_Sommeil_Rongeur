@@ -306,58 +306,77 @@ class NetworkGUI:
         if selection == "Neuronal Population":
 
             lbl = Label(frame, text="name").grid(column=0, row=0)
-            ety = Entry(frame, width=10).grid(column=1, row=0)
+            ety1 = Entry(frame, width=10)
+            ety1.grid(column=1, row=0)
 
             lbl = Label(frame, text="F").grid(column=0, row=1)
-            ety = Entry(frame, width=10).grid(column=1, row=1)
+            ety2 = Entry(frame, width=10)
+            ety2.grid(column=1, row=1)
 
             lbl = Label(frame, text="C").grid(column=0, row=2)
-            ety = Entry(frame, width=10).grid(column=1, row=2)
+            ety3 = Entry(frame, width=10)
+            ety3.grid(column=1, row=2)
 
             lbl = Label(frame, text="F_max").grid(column=0, row=3)
-            ety = Entry(frame, width=10).grid(column=1, row=3)
+            ety4 = Entry(frame, width=10)
+            ety4.grid(column=1, row=3)
 
             lbl = Label(frame, text="beta").grid(column=0, row=4)
-            ety = Entry(frame, width=10).grid(column=1, row=4)
+            ety5 = Entry(frame, width=10)
+            ety5.grid(column=1, row=4)
 
             lbl = Label(frame, text="alpha").grid(column=0, row=5)
-            ety = Entry(frame, width=10).grid(column=1, row=5)
+            ety6 = Entry(frame, width=10)
+            ety6.grid(column=1, row=5)
 
             lbl = Label(frame, text="tau_pop").grid(column=0, row=6)
-            ety = Entry(frame, width=10).grid(column=1, row=6)
+            ety7 = Entry(frame, width=10)
+            ety7.grid(column=1, row=6)
 
             lbl = Label(frame, text="neurotransmitter").grid(column=0, row=7)
-            ety = Entry(frame, width=10).grid(column=1, row=7)
+            ety8 = Entry(frame, width=10)
+            ety8.grid(column=1, row=7)
 
             lbl = Label(frame, text="gamma").grid(column=0, row=8)
-            ety = Entry(frame, width=10).grid(column=1, row=8)
+            ety9 = Entry(frame, width=10)
+            ety9.grid(column=1, row=8)
 
             lbl = Label(frame, text="tau_NT").grid(column=0, row=9)
-            ety = Entry(frame, width=10).grid(column=1, row=9)
-
+            ety10 = Entry(frame, width=10)
+            ety10.grid(column=1, row=9)
+            
             lbl = Label(frame, text="promoting").grid(column=0, row=10)
-            ety = Entry(frame, width=10).grid(column=1, row=10)
-
-            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(frame, window, "NP"),width=25).grid(column=0, row=11)
+            ety11 = Entry(frame, width=10)
+            ety11.grid(column=1, row=10)
+ 
+            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(
+                [ety1.get(), ety2.get(), ety3.get(), ety4.get(), ety5.get(), ety6.get(), ety7.get(), ety8.get(), ety9.get(), ety10.get(), ety11.get()],
+                "NP"),width=25).grid(column=0, row=11)
 
         if selection == "Homeostatic Sleep Drive":
 
             lbl = Label(frame, text="h").grid(column=0, row=0)
-            ety = Entry(frame, width=10).grid(column=1, row=0)
+            ety1 = Entry(frame, width=10)
+            ety1.grid(column=1, row=0)
 
             lbl = Label(frame, text="H_max").grid(column=0, row=1)
-            ety = Entry(frame, width=10).grid(column=1, row=1)
+            ety2 = Entry(frame, width=10)
+            ety2.grid(column=1, row=1)
 
             lbl = Label(frame, text="tau_hw").grid(column=0, row=2)
-            ety = Entry(frame, width=10).grid(column=1, row=2)
+            ety3 = Entry(frame, width=10)
+            ety3.grid(column=1, row=2)
 
             lbl = Label(frame, text="tau_hs").grid(column=0, row=3)
-            ety = Entry(frame, width=10).grid(column=1, row=3)
+            ety4 = Entry(frame, width=10)
+            ety4.grid(column=1, row=3)
 
-            lbl = Label(frame, text="theta_X").grid(column=0, row=4)
-            ety = Entry(frame, width=10).grid(column=1, row=4)
+            lbl = Label(frame, text="theta").grid(column=0, row=4)
+            ety5 = Entry(frame, width=10)
+            ety5.grid(column=1, row=4)
 
-            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(frame, window, "HSD"),width=25).grid(column=0, row=10)
+            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(
+                [ety1.get(), ety2.get(), ety3.get(), ety4.get(), ety5.get()], "HSD"),width=25).grid(column=0, row=10)
 
         if selection == "Connection":
 
@@ -402,29 +421,28 @@ class NetworkGUI:
 
         return frame
 
-    def readAndCreateComp(self,frame,window,compType):
-
-        allWidgets = frame.winfo_children() #get all widgets from the Object creation window
+    def readAndCreateComp(self,valuelist,compType):
         compParam = {}
-        for w in range(0, len(allWidgets)-1, 2):
-            compParam[(allWidgets[w]['text'])] = allWidgets[w+1].get()
-            print(allWidgets[w], allWidgets[w+1])
-
+        i = 0
         if compType == "NP":
+            attrlist = ["name","F","C","F_max","beta","alpha","tau_pop","neurotransmitter",
+                        "gamma","tau_NT","promoting"]
+            while i < len(valuelist):
+                compParam[attrlist[i]] = valuelist[i]
+                i += 1
+            print(compParam)
             self.addNP(compParam)
         elif compType == "HSD":
+            attrlist = ["h", "H_max", "tau_hw", "tau_hs", "theta"]
+            while i < len(valuelist):
+                compParam[attrlist[i]] = valuelist[i]
+                i += 1
+            print(compParam)
             self.addHSD(compParam)
 
-        window.destroy()
+        # window.destroy()
 
-    # def getEntry(self, frame):
-    #     allWidgets = frame.winfo_children()
-    #     for w in  range(len(allWidgets)):
-    #         print(allWidgets[w])
-    #         if isinstance(allWidgets[w], Entry):
-    #             a = str(allWidgets[w].get())
-    #             return a.get()  ####PROBLEM:return as stringvar type but is a string##### :o(
-  
+   
     #------------------------------Injection settings---------------------------------------
 
     def getInjectionCreationWindow(self):
@@ -499,7 +517,8 @@ class NetworkGUI:
             e4.grid(column=1, row=5)
 
 
-            b = Button(top, text="Create", command=lambda: self.addInjection(injType.get(), getConnObject(name), e1.get(), e2.get(), e3.get(), e4.get(), e5.get()),width=25).grid(column=0, row=6)
+            b = Button(top, text="Create", command=lambda: 
+                       self.addInjection(injType.get(), getConnObject(name), e1.get(), e2.get(), e3.get(), e4.get(), e5.get()),width=25).grid(column=0, row=6)
         
         lbl = Label(window, text="Select Injection").grid(column=0, row=1)
         optMenu = OptionMenu(window, connStr, *connAvailableStr, command=changeConn).grid(column=1, row=1)

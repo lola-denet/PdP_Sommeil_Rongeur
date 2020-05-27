@@ -70,6 +70,7 @@ def doStats():
 #----------- Window initialization -----------
 
 window = tk.Tk()
+
 window.title("SR sim")
 widthScreen = window.winfo_screenwidth()
 heightScreen = window.winfo_screenheight()

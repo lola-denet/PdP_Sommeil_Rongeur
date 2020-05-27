@@ -117,7 +117,7 @@ class Network(NetworkGUI):
             if isinstance(c,NeuronalPopulation):
                 noise = self.additiveWhiteGaussianNoise()
                 c.setNextStepRK4(noise)
-            elif isinstance(c,ParaInjections):
+            elif isinstance(c,ParaInjection):
                 pass
             else:
                 c.setNextStepRK4()
@@ -208,7 +208,7 @@ class Network(NetworkGUI):
         self.compartments ['HSD'] = HomeostaticSleepDrive(cycleParam)
 
     def addINJ(self, injParam):
-        self.compartments [injParam["name"]] = ParaInjections(injParam)
+        self.compartments [injParam["name"]] = ParaInjection(injParam)
         
     def addNPConnection(self, type, sourceName, targetName, weight): #Add a connection object to the concerned compartment
         self.compartments [targetName].connections.append(Connection(type, self.compartments [sourceName],self.compartments [targetName],weight))
@@ -246,7 +246,7 @@ class Network(NetworkGUI):
 
 
 
-class ParaInjections :
+class ParaInjection :
     
     def __init__(self, myInjection) :
         self.name = myInjection["name"]
@@ -274,8 +274,8 @@ class NeuronalPopulation :
 
     # creation of the class NeuronalPopulation using the dictionnary "population"
     def __init__(self,myPopulation) :
-        self.name = myPopulation["name"]
-        self.promoting = myPopulation["promoting"] #
+        self.name = str(myPopulation["name"])
+        self.promoting = str(myPopulation["promoting"]) 
         #List of 'Connection' objects
 
 
