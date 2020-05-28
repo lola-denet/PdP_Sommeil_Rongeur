@@ -123,10 +123,10 @@ b.grid(column=0, row=3)
 #--------------Param menu widgets-------------------
 
 b = tk.Button(paramMenu, text="Display Compartments Parameters", command=lambda: network.displayCompParam(paramMenu))
-b.grid(column=0, row=0)
+b.grid(column=0, row=4)
 
 b = tk.Button(paramMenu, text="Add Object to Network", command=lambda: network.addObjToModel(network),width=25)
-b.grid(column=0, row=4)
+b.grid(column=0, row=0)
 
 b = tk.Button(paramMenu, text="Save Parameters", command=lambda: write_parameters(filedialog.asksaveasfile(title="Save as", initialdir=os.getcwd(), mode="w", defaultextension=".txt"),network))
 b.grid(column=0, row = 6)
