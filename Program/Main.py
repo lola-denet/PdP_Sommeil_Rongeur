@@ -121,7 +121,7 @@ txt.insert(END, "Enter compartment name")
 txt.grid(column=1, row=3)
 
 
-b = tk.Button(mainMenu, text="Print compartiments' parameters and type", command=lambda: network.printAttrType(txt.get()),width=45) # Useful to debug
+b = tk.Button(mainMenu, text="Print compartment' parameters and type", command=lambda: network.printAttrType(txt.get()),width=45) # Useful to debug
 b.grid(column=0, row=3)
 
 
