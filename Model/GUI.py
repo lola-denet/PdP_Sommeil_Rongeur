@@ -295,7 +295,7 @@ class NetworkGUI:
         
     def addObjToModel(self, network):
         window = Toplevel()
-        window.geometry('700x500')
+        window.geometry('800x500')
         window.title("Add object")
         options = ["Neuronal Population", "Homeostatic Sleep Drive", "Connection"]
         var = StringVar()
