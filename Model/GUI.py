@@ -294,13 +294,16 @@ class NetworkGUI:
     #-----------Display window for the creation of new compartment/connection------------
         
     def addObjToModel(self, network):
-
         window = Toplevel()
+        window.geometry('700x500')
+        window.title("Add object")
         options = ["Neuronal Population", "Homeostatic Sleep Drive", "Connection"]
         var = StringVar()
+        Label(window, text="Please choose which type of compartment you want to add :").grid(column=1, row=0)
         optMenu = OptionMenu(window, var, *options, command=lambda naz: self.getCreateObjFrame(naz, window, optMenu, network).grid(column=3, row=4))
-        optMenu.place(x=10, y=10)
-    
+        optMenu.place(x=30, y=30)
+        b = Button(window, text="Task completed", command=lambda: window.destroy(),width=25)
+        b.place(x=30, y=300)
     def getCreateObjFrame(self, selection, window, optMenu, network):
         frame = Frame (window)
         if selection == "Neuronal Population":
@@ -349,7 +352,7 @@ class NetworkGUI:
             ety11 = Entry(frame, width=10)
             ety11.grid(column=1, row=10)
  
-            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(
+            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(frame,
                 [ety1.get(), ety2.get(), ety3.get(), ety4.get(), ety5.get(), ety6.get(), ety7.get(), ety8.get(), ety9.get(), ety10.get(), ety11.get()],
                 "NP"),width=25).grid(column=0, row=11)
 
@@ -375,7 +378,7 @@ class NetworkGUI:
             ety5 = Entry(frame, width=10)
             ety5.grid(column=1, row=4)
 
-            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(
+            b = Button(frame, text="Create", command=lambda: self.readAndCreateComp(frame,
                 [ety1.get(), ety2.get(), ety3.get(), ety4.get(), ety5.get()], "HSD"),width=25).grid(column=0, row=10)
 
         if selection == "Connection":
@@ -416,12 +419,13 @@ class NetworkGUI:
             e = Entry(frame)
             e.grid(column=1, row=3)
 
-            b = Button(frame, text="Create", command=lambda: self.addNPConnection(Type.get(), source.get(), target.get(), e.get() ),width=25).grid(column=0, row=4)
-            #b = Button(frame, text="Create", command=lambda: self.getEntry(frame) ,width=25).grid(column=0, row=4)
-
+            b = Button(frame, text="Create", command=lambda: 
+                       [self.addNPConnection(Type.get(), source.get(), target.get(), e.get()),
+                        frame.destroy()],width=25).grid(column=0, row=4)
+             
         return frame
 
-    def readAndCreateComp(self,valuelist,compType):
+    def readAndCreateComp(self,window,valuelist,compType):
         compParam = {}
         i = 0
         if compType == "NP":
@@ -439,9 +443,8 @@ class NetworkGUI:
                 i += 1
             print(compParam)
             self.addHSD(compParam)
-
-        # window.destroy()
-
+            
+        window.destroy()
    
     #------------------------------Injection settings---------------------------------------
 
@@ -466,7 +469,9 @@ class NetworkGUI:
                         connAvailableStr.append("Injection of: "+str(i.source.neurotransmitter)+" in "+str(i.target.name))
                         connAvailable.append(i)
 
-        def getName(name):
+        def getName(window, name):
+            window.destroy()
+            
             top = Toplevel()  
             top.title('Injection parameters')  
             print(name)
@@ -518,12 +523,14 @@ class NetworkGUI:
 
 
             b = Button(top, text="Create", command=lambda: 
-                       self.addInjection(injType.get(), getConnObject(name), e1.get(), e2.get(), e3.get(), e4.get(), e5.get()),width=25).grid(column=0, row=6)
-        
+                       [self.addInjection(injType.get(), getConnObject(name), e1.get(), e2.get(), e3.get(), e4.get(), e5.get()),
+                        top.destroy()],width=25).grid(column=0, row=6)
+            
+            
         lbl = Label(window, text="Select Injection").grid(column=0, row=1)
         optMenu = OptionMenu(window, connStr, *connAvailableStr, command=changeConn).grid(column=1, row=1)
 
-        Button(window, text="Create", command=lambda :getName(connStr.get()),width=25).grid(column=1, row=2)
+        Button(window, text="Create", command=lambda :getName(window, connStr.get()),width=25).grid(column=1, row=2)
    
         # lbl = Label(window, text="P0").grid(column=0, row=4)  
         # e1 = Entry(window)
