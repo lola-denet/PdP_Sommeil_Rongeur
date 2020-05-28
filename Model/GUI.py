@@ -295,7 +295,7 @@ class NetworkGUI:
         
     def addObjToModel(self, network):
 
-        window = Tk()
+        window = Toplevel()
         options = ["Neuronal Population", "Homeostatic Sleep Drive", "Connection"]
         var = StringVar()
         optMenu = OptionMenu(window, var, *options, command=lambda naz: self.getCreateObjFrame(naz, window, optMenu, network).grid(column=3, row=4))
@@ -383,7 +383,7 @@ class NetworkGUI:
             compsNames = []
             target = StringVar()
             source = StringVar()
-            type = StringVar()
+            Type = StringVar()
             weightVal = 0
 
             def changeTarget(new):
@@ -395,8 +395,8 @@ class NetworkGUI:
                 print(source)
 
             def changeType(new):
-                type = new
-                print(type)
+                Type = new
+                print(Type)
 
             for c in self.compartments.keys():
                 compsNames.append(c)
@@ -404,7 +404,7 @@ class NetworkGUI:
             types = ["NP-NP","HSD-NP","NP-HSD"]
 
             lbl = Label(frame, text="Select Connection Type").grid(column=0, row=0)
-            optMenu = OptionMenu(frame, target, *types, command=changeType).grid(column=1, row=0)
+            optMenu = OptionMenu(frame, Type, *types, command=changeType).grid(column=1, row=0)
 
             lbl = Label(frame, text="Select Source Compartment").grid(column=0, row=1)
             optMenu = OptionMenu(frame, source, *compsNames, command=changeSource).grid(column=1, row=1)
@@ -416,7 +416,7 @@ class NetworkGUI:
             e = Entry(frame)
             e.grid(column=1, row=3)
 
-            b = Button(frame, text="Create", command=lambda: self.addNPConnection(type.get(), source.get(), target.get(), e.get() ),width=25).grid(column=0, row=4)
+            b = Button(frame, text="Create", command=lambda: self.addNPConnection(Type.get(), source.get(), target.get(), e.get() ),width=25).grid(column=0, row=4)
             #b = Button(frame, text="Create", command=lambda: self.getEntry(frame) ,width=25).grid(column=0, row=4)
 
         return frame
