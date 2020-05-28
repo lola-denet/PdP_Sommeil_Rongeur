@@ -52,7 +52,7 @@ def read_parameters(file) :
                 check_inj = 0
 
             elif (check_pop == 1 and line[0] != "*") :
-                if line[0] == "g_NT_pop_list" or line[0] == "pop_list" or line[0] == "beta" :
+                if line[0] == "g_NT_pop_list" or line[0] == "pop_list" :
                     myParameter = []
                     for i in range(2,len(line)) :
                         myParameter.append(line[i])
@@ -82,7 +82,7 @@ def read_parameters(file) :
     fic.close()
     return populations,cycles,simulation_parameters,connections,microinjections
 
-#print(read_parameters("6pop_injections.txt")[4])
+#print(read_parameters("6pop_injections.txt")[4])    or line[0] == "beta" 
 
 def write_parameters(name_file,network) :
     ### writes a file with the input parameters
