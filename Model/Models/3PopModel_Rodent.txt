@@ -25,7 +25,7 @@ promoting = NREM
 F = 5.0
 F_max = 5.0
 alpha = 0.25
-beta = 2.5 homeostatic
+beta = 0
 tau_pop = 10000
 g_NT_pop_list = -2.0 -2.5
 pop_list = wake homeostatic
@@ -75,3 +75,24 @@ res = 50
 mean = 0
 std = 0.001
 #
+
+& neurotransmitter = noradrenaline
+agoniste = 
+antagoniste = 
+imin = 
+imax = 
+&
+
+& neurotransmitter = acetylcholin
+agoniste = 
+antagoniste = 
+imin = 
+imax = 
+&
+
+& neurotransmitter = GABA
+agoniste = 
+antagoniste = 
+imin = 
+imax = 
+&

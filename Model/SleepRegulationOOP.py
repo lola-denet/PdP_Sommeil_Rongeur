@@ -53,8 +53,8 @@ class Network(NetworkGUI):
             self.mean = float(args[0]["mean"])
             self.std = float(args[0]["std"])
        
-        self.nlist = ['GABA_VLPO', 'GABA_SCN', 'acetylcholin_WR', 'acetylcholin_R', 'noradrenaline_LC', 'serotonin_DR']
-    
+        self.nlist = ['GABA_VLPO', 'GABA_SCN', 'acetylcholin_WR', 'acetylcholin_R', 'noradrenaline_LC', 
+                      'serotonin_DR', 'noradrenaline', 'acetylcholin', 'GABA']
     #-----------------------------------Noise-----------------------------------#
 
     def additiveWhiteGaussianNoise(self): #Returns white noise from a Gaussian distribution
@@ -106,8 +106,10 @@ class Network(NetworkGUI):
 
     def nextStepRK4(self): #call RK4 next step method in each compartments
         for N in range(4):
-            for c in self.compartments.values():
-                c.setNextSubStepRK4(self.dt,N,self.A[N])
+            for c in self.compartments.keys():
+                if c not in self.nlist:
+            # for c in self.compartments.values():
+                    self.compartments[c].setNextSubStepRK4(self.dt,N,self.A[N])
             for i in self.injections:
                 i.setNextSubStepRK4(self.dt,N,self.A[N])
 
@@ -115,6 +117,8 @@ class Network(NetworkGUI):
             if isinstance(c,NeuronalPopulation):
                 noise = self.additiveWhiteGaussianNoise()
                 c.setNextStepRK4(noise)
+            elif isinstance(c,ParaInjection):
+                pass
             else:
                 c.setNextStepRK4()
 
@@ -163,12 +167,11 @@ class Network(NetworkGUI):
         filename.close()
 
     #-----------------------------Recorders--------------------------------------#
-    
+
     def initResults(self): #Set the correct number of Sublist in self.results in function of the number of variable to be saved
         for header in self.recorder():
             self.results.append([header])
             self.headers.append(header)
-        
         for c in self.compartments.keys():
             if c not in self.nlist:
                 for header in self.compartments[c].recorder():
@@ -205,7 +208,7 @@ class Network(NetworkGUI):
         self.compartments ['HSD'] = HomeostaticSleepDrive(cycleParam)
 
     def addINJ(self, injParam):
-        self.compartments [injParam["name"]] = MicroInjection(injParam)
+        self.compartments [injParam["name"]] = ParaInjection(injParam)
         
     def addNPConnection(self, type, sourceName, targetName, weight): #Add a connection object to the concerned compartment
         self.compartments [targetName].connections.append(Connection(type, self.compartments [sourceName],self.compartments [targetName],weight))
@@ -227,8 +230,7 @@ class Network(NetworkGUI):
     def displayConnections(self): #Print all connections wich are in a compartment informations
         for attr, value in self.compartments.items():
             if attr not in self.nlist:
-                for conn in value.connections:                        
-            # for conn in value.connections:
+                for conn in value.connections:      
                     print("Connection type: ",conn.type,"  ",conn.source.name,"--",conn.weight,"-->",conn.target.name)
 
     #-----------------------------Save parameters------------------------------------#
@@ -244,7 +246,7 @@ class Network(NetworkGUI):
 
 
 
-class MicroInjection :
+class ParaInjection :
     
     def __init__(self, myInjection) :
         self.name = myInjection["name"]
@@ -252,8 +254,15 @@ class MicroInjection :
         self.antagoniste = myInjection["antagoniste"]
         self.imin = myInjection["imin"]
         self.imax = myInjection["imax"]
-        
-        
+    
+    def save_parameters(self) :
+        string = "& neurotransmitter = "+self.name+"\n"
+        for parameter in vars(self) :
+            if parameter == 'agoniste' or parameter == 'antagoniste' or parameter == 'imin' or parameter == 'imax' :
+                string += parameter+" = "+str(getattr(self,parameter))+"\n"
+        string += "&\n\n"
+        return string
+    
 ########################NeuronalPopulation ############################
 #Class representing a neuronal population                             #
 #######################################################################
@@ -265,8 +274,8 @@ class NeuronalPopulation :
 
     # creation of the class NeuronalPopulation using the dictionnary "population"
     def __init__(self,myPopulation) :
-        self.name = myPopulation["name"]
-        self.promoting = myPopulation["promoting"] #
+        self.name = str(myPopulation["name"])
+        self.promoting = str(myPopulation["promoting"]) 
         #List of 'Connection' objects
 
 
@@ -276,7 +285,7 @@ class NeuronalPopulation :
 
         #Firing rate parameters (Constants used in the FiringRate equation)
         self.F_max = float(myPopulation["F_max"])
-        self.beta = myPopulation["beta"]
+        self.beta = float(myPopulation["beta"])
         self.alpha = float(myPopulation["alpha"])
         self.tau_pop = float(myPopulation["tau_pop"])
 
@@ -336,12 +345,10 @@ class NeuronalPopulation :
         return (np.tanh(self.F[0]/self.gamma) - self.C[0])/self.tau_NT
 
     def getBeta(self,N): #used to handle the homeostatic sleep drive
-
         for c in self.connections:
             if c.type == "HSD-NP":
                 return c.getConnectVal(N)
-
-        return float(self.beta[0])
+        return self.beta
 
     #---------------------------------Recorder------------------------------------#
 
@@ -354,14 +361,17 @@ class NeuronalPopulation :
 
     def save_parameters(self) :
         string = "* population = "+self.name+"\n"
+        # print(vars(self))
         for parameter in vars(self) :
             if parameter == 'F' or parameter == 'C' :
                 string += parameter+" = "+str(getattr(self,parameter)[0])+"\n"
+           
             elif parameter == 'connections' :
                 tmp = {}
                 tmp["g_NT_pop_list"] = []
                 tmp["pop_list"] = []
                 for connection in getattr(self,parameter) :
+                    print(connection.weight)
                     tmp["g_NT_pop_list"].append(connection.weight)
                     tmp["pop_list"].append(connection.source.name)
                 for (key,value) in tmp.items() :
@@ -369,17 +379,19 @@ class NeuronalPopulation :
                     for element in value :
                         string += " "+str(element)
                     string += "\n"
-            elif isinstance(getattr(self,parameter),list) :
-                string += parameter+" ="
-                for value in getattr(self,parameter) :
-                    string += " "+str(value)
-                string += "\n"
+                    
+            # elif isinstance(getattr(self,parameter),list) :
+            #     string += parameter+" ="
+            #     for value in getattr(self,parameter) :
+            #         string += " "+str(value)
+            #     string += "\n"
+                
             elif parameter != 'name' and parameter != 'connections':
                 string += parameter+" = "+str(getattr(self,parameter))+"\n"
         string += "*\n\n"
         return string
-
-
+    
+            
 ########################HOMEOSTATIC SLEEP DRIVE##########################
 #                                                                       #
 #########################################################################
@@ -451,6 +463,7 @@ class HomeostaticSleepDrive:
                 tmp["g_NT_pop_list"] = []
                 tmp["pop_list"] = []
                 for connection in getattr(self,parameter) :
+                    print(connection.weight)
                     tmp["g_NT_pop_list"].append(connection.weight)
                     tmp["pop_list"].append(connection.source.name)
                 for (key,value) in tmp.items() :
@@ -458,11 +471,11 @@ class HomeostaticSleepDrive:
                     for element in value :
                         string += " "+str(element)
                     string += "\n"
-            elif isinstance(getattr(self,parameter),list) :
-                string += parameter+" ="
-                for value in getattr(self,parameter) :
-                    string += " "+str(value)
-                string += "\n"
+            # elif isinstance(getattr(self,parameter),list) :
+            #     string += parameter+" ="
+            #     for value in getattr(self,parameter) :
+            #         string += " "+str(value)
+            #     string += "\n"
             elif parameter != 'name' and parameter != 'connections':
                 string += parameter+" = "+str(getattr(self,parameter))+"\n"
         string += "+\n\n"
