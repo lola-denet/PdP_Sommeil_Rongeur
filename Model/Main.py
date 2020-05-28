@@ -1,9 +1,13 @@
 #!bin/python
 #-*-coding:utf-8-*-
 
-# 05/12/19
-#build by
-# Authors: Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz
+# Program produced by Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz on May 2019
+# based on the article by Costa and his colleagues in 2016
+
+# Program modified by Paul Bielle / Lola Denet / Charles Guinot / Tongyuxuan Hui / Wenli Niu on May 2020 
+# based on the article by Fleshner and his colleagues in 2010
+
+# Supervised by Dr Charlotte Héricé
 
 import tkinter as tk
 from tkinter import *
@@ -73,6 +77,7 @@ def doStats():
 window = tk.Tk()
 
 window.title("SR sim")
+# Get the screen width and height and scale the window
 widthScreen = window.winfo_screenwidth()
 heightScreen = window.winfo_screenheight()
 window.geometry("{}x{}".format(int(widthScreen), int(heightScreen)))

@@ -1,3 +1,11 @@
+# Program produced by Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz on May 2019
+# based on the article by Costa and his colleagues in 2016
+
+# Program modified by Paul Bielle / Lola Denet / Charles Guinot / Tongyuxuan Hui / Wenli Niu on May 2020 
+# based on the article by Fleshner and his colleagues in 2010
+
+# Supervised by Dr Charlotte Héricé
+
 ###################
 # Hypnogram Stats #
 ###################

@@ -1,6 +1,14 @@
 #!bin/python
 #-*-coding:utf-8-*-
 
+# Program produced by Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz on May 2019
+# based on the article by Costa and his colleagues in 2016
+
+# Program modified by Paul Bielle / Lola Denet / Charles Guinot / Tongyuxuan Hui / Wenli Niu on May 2020 
+# based on the article by Fleshner and his colleagues in 2010
+
+# Supervised by Dr Charlotte Héricé
+
 ###### IMPORTATIONS ######
 
 ### If user is on Mac ###
@@ -158,7 +166,7 @@ def createGraph(data,neurotransmitters,option=0):
         line = '-'
         transparency = 1
 
-    ### defines the corresponding colors for the 3 population and 5 population model
+    ### defines the corresponding colors for the 3 population and 6 populations models
     colors = {
         'wake' : 'g',
         'NREM' : 'r',
@@ -180,13 +188,13 @@ def createGraph(data,neurotransmitters,option=0):
         if population not in colors.keys() :
             colors[population] = "xkcd:"+random.choice(listColors)
     
-    ### translate the time initially in ms to hours
+    ### translate the time initially in s to hours or minutes
     time_ms = []
     time_h = []
     unit = 60*60
     step_hour = 2
     lim = 24.0
-    if data['time'][-1] <= 3600 :
+    if data['time'][-1] <= 3600 : 
         step_hour = 0.25
         unit=60
         lim = 60.0
@@ -194,6 +202,7 @@ def createGraph(data,neurotransmitters,option=0):
         if t % (60*60*step_hour) == 0 :
             time_ms.append(t)
             time_h.append(int(t)/unit)
+    # Add the last value of time axis
     time_ms.append(lim*unit)
     time_h.append(lim)
     
@@ -219,12 +228,13 @@ def createGraph(data,neurotransmitters,option=0):
                 for (fr, values) in data[sem]["firing rates"].items() :
                     sub1=plt.plot(data['time'], values, color=colors[fr], linewidth=0.25)
                     sub1=plt.fill_between(data['time'],values,data['firing rates'][fr],color=colors[fr],alpha=0.25)
+        # show sticks, labels, title and legends
         xticks(time_ms,time_h)
         plt.ylabel('Activity (Hz)')
         plt.title('Firing rates ~ Time', fontsize=12, fontweight='bold')
         chartBox = ax.get_position()
         ax.set_position([chartBox.x0, chartBox.y0, chartBox.width, chartBox.height])
-        ax.legend(loc='upper center', bbox_to_anchor=((chartBox.width+0.34), (chartBox.height+0.85)), shadow=True, ncol=1)
+        ax.legend(loc='upper center', bbox_to_anchor=((chartBox.width+0.34), (chartBox.height+0.85)), shadow=True, ncol=1) # legend outside graph
 
 
     ### subplot 2 - concentrations
@@ -250,12 +260,12 @@ def createGraph(data,neurotransmitters,option=0):
                 for (c,values) in data[sem]["concentrations"].items() :
                     sub2=plt.plot(data['time'], values, color=colors[c], linewidth=0.25)
                     sub2=plt.fill_between(data['time'],values,data['concentrations'][c],color=colors[c],alpha=0.25)
-
+        # show sticks, labels, title and legends
         plt.ylabel("Concentrations (aU)")
         plt.title('Neurotransmitter concentrations ~ Time', fontsize=12, fontweight='bold')
         chartBox = ax.get_position()
         ax.set_position([chartBox.x0, chartBox.y0, chartBox.width, chartBox.height])
-        ax.legend(loc='upper center', bbox_to_anchor=((chartBox.width+0.38), (chartBox.height+0.85)), shadow=True, ncol=1)
+        ax.legend(loc='upper center', bbox_to_anchor=((chartBox.width+0.38), (chartBox.height+0.85)), shadow=True, ncol=1) # legend outside graph
 
 
     ### subplot 3 - hypnogram
@@ -265,10 +275,10 @@ def createGraph(data,neurotransmitters,option=0):
         plt.ylim(-0.5,1.5)
         xticks(time_ms,time_h)
         yticks([0,0.5,1],['NREM','REM','Wake'])
-        if data['time'][-1]<=3600:
+        if data['time'][-1]<=3600: # Rodents models 
             plt.xlabel('Time (min)')
         else : 
-            plt.xlabel('Time (h)')
+            plt.xlabel('Time (h)') # Human model
         plt.ylabel('Hypnogram')
         plt.title('Hypnogram ~ Time', fontsize=12, fontweight='bold')
 
@@ -343,19 +353,19 @@ def createMeanGraphs(files,option=0) :
                     mean_data[variable+'_sem_min'].append(mean_data[variable][k]-sem)
                     mean_data[variable+'_sem_max'].append(mean_data[variable][k]+sem)
 
-    # computes the hypnogram
+    # computes the hypnogram according type of model
 
     mean_data['hypnogram'] = []
     key_wake_C = ""
     key_REM_C = ""
-    if 'LC_C' in mean_data.keys() :
+    if 'LC_C' in mean_data.keys() : # 6 populations models
         key_wake_C="LC_C"
         key_REM_C="R_C"
-    elif 'wake_C' in mean_data.keys():
+    elif 'wake_C' in mean_data.keys(): # 3 populations models
         key_wake_C="wake_C"
         key_REM_C="REM_C"
     else : 
-        print("Unknown population")
+        print("Unknown population") # if the name of the population is different of 6 and 3 populations models
         return
 
     for i in range(len(mean_data['time'])):
