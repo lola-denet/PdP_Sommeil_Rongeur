@@ -46,12 +46,17 @@ class NetworkGUI:
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(xscrollcommand=scrollbar.set)
         i = 0
+        j = 0
         for comp in self.compartments.values():
             i += 10
             frame = self.getCompartmentFrame(comp, scrollable_frame)
-            frame.grid(column=i, row=0)
+            if comp.name in self.nlist and j == 0:
+                Label(scrollable_frame, text="Parameters specially for Microinjection ：",
+                      bg='lemonchiffon',width=50,height=2,font=("Courier",15)).grid(row=0,column=i,columnspan=30)
+                j+=1
+            frame.grid(column=i, row=1)
             canvas.create_window(0, 0)
-
+                
         container.grid()
         canvas.grid(column=0,row=2, rowspan=2)
         scrollbar.grid(column=0,row=1,sticky='we')
@@ -61,10 +66,13 @@ class NetworkGUI:
 
         i = 0
         compFrame = Frame (frame)
-
         lbl = Label(compFrame, text=comp.name)
         lbl.config(font=("Courier", 15))
         lbl.grid(column=0, row=0)
+        if comp.name in self.nlist:
+            compFrame.config(bg='lemonchiffon')
+            lbl.config(bg='lemonchiffon')
+        
 
         def callback(attr, attrB): #function call back for real-time tracing
             try:
@@ -92,8 +100,6 @@ class NetworkGUI:
         for attr, value in comp.__dict__.items():
 
             attrB = attr #making a copy of attr for trace
-
-
             attrB = StringVar()
             attrB.set(value)
             attrB.trace("w", lambda name, index, mode,attr=attr, attrB=attrB: callback(attr, attrB))
@@ -124,20 +130,20 @@ class NetworkGUI:
                     e.grid(column=3, row=i)
                     weight.trace("w", lambda name, index, mode, weight=weight, c=c: callbackW(weight, c))
 
-            elif attr == "name":
-                i += 1
-                lbl = Label(compFrame, text=attr)
-                lbl.grid(column=0, row=i)
-                txt = Entry(compFrame, width=10)
-                txt.insert(END, value)
-                txt.grid(column=1, row=i)
-            elif attr == "promoting":
-                i += 1
-                lbl = Label(compFrame, text=attr)
-                lbl.grid(column=0, row=i)
-                txt = Entry(compFrame, width=10)
-                txt.insert(END, value)
-                txt.grid(column=1, row=i)
+            # elif attr == "name":
+            #     i += 1
+            #     lbl = Label(compFrame, text=attr)
+            #     lbl.grid(column=0, row=i)
+            #     txt = Entry(compFrame, width=10)
+            #     txt.insert(END, value)
+            #     txt.grid(column=1, row=i)
+            # elif attr == "promoting":
+            #     i += 1
+            #     lbl = Label(compFrame, text=attr)
+            #     lbl.grid(column=0, row=i)
+            #     txt = Entry(compFrame, width=10)
+            #     txt.insert(END, value)
+            #     txt.grid(column=1, row=i)
             elif attr == "F" or attr == "C" or attr == "h":
                 i += 1
                 lbl = Label(compFrame, text=attr)
@@ -146,6 +152,15 @@ class NetworkGUI:
                 txt.config(textvariable=attrB)
                 txt.delete(0,END)
                 txt.insert(END, value[0])
+                txt.grid(column=1, row=i)              
+            elif comp.name in self.nlist:
+                i += 1
+                lbl = Label(compFrame, text=attr,bg='lemonchiffon')
+                lbl.grid(column=0, row=i)
+                txt = Entry(compFrame, width=10)
+                txt.config(textvariable=attrB,bg='lemonchiffon')
+                txt.delete(0,END)
+                txt.insert(END, value)
                 txt.grid(column=1, row=i)
             else:
                 i += 1
@@ -156,7 +171,8 @@ class NetworkGUI:
                 txt.delete(0,END)
                 txt.insert(END, value)
                 txt.grid(column=1, row=i)
-
+        
+            
         #b = Button(compFrame, text="Apply changes", command=lambda: self.saveAndClose(var,window),width=25).grid(column=2, row=0)
 
 

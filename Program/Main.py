@@ -1,13 +1,9 @@
 #!bin/python
 #-*-coding:utf-8-*-
 
-# Program produced by Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz on May 2019
-# based on the article by Costa and his colleagues in 2016
-
-# Program modified by Paul Bielle / Lola Denet / Charles Guinot / Tongyuxuan Hui / Wenli Niu on May 2020 
-# based on the article by Fleshner and his colleagues in 2010
-
-# Supervised by Dr Charlotte Héricé
+# 05/12/19
+#build by
+# Authors: Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz
 
 import tkinter as tk
 from tkinter import *
@@ -75,9 +71,7 @@ def doStats():
 #----------- Window initialization -----------
 
 window = tk.Tk()
-
 window.title("SR sim")
-# Get the screen width and height and scale the window
 widthScreen = window.winfo_screenwidth()
 heightScreen = window.winfo_screenheight()
 window.geometry("{}x{}".format(int(widthScreen), int(heightScreen)))
@@ -108,7 +102,7 @@ n.add(statMenu, text='Statistics')
 
 #-----------Main menu widgets---------------
 
-tk.Button(mainMenu, text="Load model", command=lambda:loadModel(),width=25).grid(column=0, row=0)
+tk.Button(mainMenu, text="Load model",bg='lightblue', command=lambda:loadModel(),width=25).grid(column=0, row=0)
 
 b = tk.Button(mainMenu, text="Display network", command=lambda: network.displayGraph(),width=25)
 b.grid(column=0, row=1)
@@ -121,7 +115,7 @@ txt.insert(END, "Enter compartment name")
 txt.grid(column=1, row=3)
 
 
-b = tk.Button(mainMenu, text="Print compartment' parameters and type", command=lambda: network.printAttrType(txt.get()),width=45) # Useful to debug
+b = tk.Button(mainMenu, text="Print parameters and type of compartment", command=lambda: network.printAttrType(txt.get()),width=45) # Useful to debug
 b.grid(column=0, row=3)
 
 
@@ -131,25 +125,25 @@ b.grid(column=0, row=3)
 b = tk.Button(paramMenu, text="Add Object to Network", command=lambda: network.addObjToModel(network),width=25)
 b.grid(column=0, row=0)
 
-b = tk.Button(paramMenu, text="Display Compartments Parameters", command=lambda: network.displayCompParam(paramMenu))
+b = tk.Button(paramMenu, text="Display Compartments Parameters",bg='lightblue', command=lambda: network.displayCompParam(paramMenu))
 b.grid(column=0, row=4)
 
 b = tk.Button(paramMenu, text="Save Parameters", command=lambda: write_parameters(filedialog.asksaveasfile(title="Save as", initialdir=os.getcwd(), mode="w", defaultextension=".txt"),network))
 b.grid(column=0, row = 6)
 
-b = tk.Button(paramMenu, text="Add injection", command=lambda:network.getInjectionCreationWindow())
+b = tk.Button(paramMenu, text="Add injection",bg='lemonchiffon', command=lambda:network.getInjectionCreationWindow())
 b.grid(column=0, row = 7)
 
 #--------------Run menu widgets-------------------
 
-b = tk.Button(runMenu, text="Run sim", command=lambda: network.getResults(),width=25)
+b = tk.Button(runMenu, text="Run sim",bg='lightblue', command=lambda: network.getResults(),width=25)
 b.grid(row=0)
 b = tk.Button(runMenu, text="Select variables to save(WIP)", command=lambda: network.displayCompVar().grid(column=0, row=2),width=25)
 b.grid(row=2)
 
 #--------------Visualization menu widgets-------------------
 
-b = tk.Button(visuMenu, text="Visualize the results from the simulation", command=lambda: GraphFromSim(network.results,network.fileHeader()),width=75).grid(column=0, row=0)
+b = tk.Button(visuMenu, text="Visualize the results from the simulation",bg='lightblue', command=lambda: GraphFromSim(network.results,network.fileHeader()),width=75).grid(column=0, row=0)
 b = tk.Button(visuMenu, text="Visualize precedent results", command=lambda: GraphFromCSV(filedialog.askopenfilename(initialdir = os.getcwd(),title = "Select file",filetypes = (("CSV files","*.csv"),("all files","*.*")))),width=75).grid(column=0, row=1)
 b = tk.Button(visuMenu, text="Visualize a mean graph from multiple results", command=lambda: createMeanGraphs(filedialog.askopenfilenames(initialdir = os.getcwd(),title = "Select files", filetypes = (("CSV files","*.csv"),("all files","*.*")))),width=75).grid(column=0,row=2)
 b = tk.Button(visuMenu, text="Compare results to a control", command=lambda: compareWithControl(),width=75).grid(column=0,row=3)
