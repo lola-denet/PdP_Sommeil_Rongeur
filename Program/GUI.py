@@ -1,8 +1,14 @@
 #!bin/python
 #-*-coding:utf-8-*-
 
-# 05/12/19
-# Authors: Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz
+# Program produced by Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz on May 2019
+# based on the article by Costa and his colleagues in 2016
+
+# Program modified by Paul Bielle / Lola Denet / Charles Guinot / Tongyuxuan Hui / Wenli Niu on May 2020 
+# based on the article by Fleshner and his colleagues in 2010
+
+# Supervised by Dr Charlotte Héricé
+
 
 
 #######################IMPORTATIONS########################
@@ -28,6 +34,7 @@ class NetworkGUI:
         widthScreen = window.winfo_screenwidth()
         heightScreen = window.winfo_screenheight()
 
+
         # Canvas creation
 
         container = ttk.Frame(window, relief=tk.SUNKEN)
@@ -50,7 +57,7 @@ class NetworkGUI:
         scrollbar.grid(column=0,row=1,sticky='we')
         window.mainloop()
 
-    def getCompartmentFrame(self, comp, frame):
+    def getCompartmentFrame(self, comp, frame): #function for modifying parameters in the panel
 
         i = 0
         compFrame = Frame (frame)
@@ -59,12 +66,10 @@ class NetworkGUI:
         lbl.config(font=("Courier", 15))
         lbl.grid(column=0, row=0)
 
-        def callback(attr, attrB):
+        def callback(attr, attrB): #function call back for real-time tracing
             try:
                 if attr == "F" or  attr =="C" or attr =="h":
                     comp.__dict__[attr] = [float(attrB.get()),0,0,0,0]
-                # elif attr == "beta":
-                #     print("beta")
                 else:
                     comp.__dict__[attr] = float(attrB.get())
                 print (attrB.get())
@@ -74,7 +79,7 @@ class NetworkGUI:
                 print (attrB.get())
 
 
-        def callbackW(weight, c):
+        def callbackW(weight, c): #function call back for real-time tracing
             try:
                 c.__dict__["weight"]=float(weight.get())
                 print (weight.get())
@@ -156,6 +161,7 @@ class NetworkGUI:
 
 
         return compFrame
+
 
     #---------------Display simulation parameters---------------------------
 
@@ -272,6 +278,114 @@ class NetworkGUI:
         return frame
 
 
+        def callbackT(T):
+            self.T = float(T.get())
+            print (T.get())
+
+        def callbackres(res):
+            self.res = float(res.get())
+            self.dt = 1E3/self.res
+            print (res.get())
+
+        def callbackSaveRate(saveRate):
+            self.saveRate = float(saveRate.get())
+            print (saveRate.get())
+
+        def callbackMean(mean):
+            self.mean = float(mean.get())
+            print (mean.get())
+
+        def callbackStd(std):
+            self.std = float(std.get())
+            print (std.get())
+
+        T = StringVar()
+        T.trace("w", lambda name, index, mode, T=T: callbackT(T))
+
+        res = StringVar()
+        res.trace("w", lambda name, index, mode, res=res: callbackres(res))
+
+        saveRate = StringVar()
+        saveRate.trace("w", lambda name, index, mode, saveRate=saveRate: callbackSaveRate(saveRate))
+
+        mean = StringVar()
+        mean.trace("w", lambda name, index, mode, mean=mean: callbackMean(mean))
+
+        std = StringVar()
+        std.trace("w", lambda name, index, mode, std=std: callbackStd(std))
+
+        frame = Frame(window)
+
+        resMethod = StringVar()
+        optMethod = ["Euler", "RK4"]
+
+        def changeMethod(new):
+            resMethod = new
+            print(resMethod)
+            self.resMethod = new
+
+
+
+        lbl = Label(frame, text="Select Resolution Method").grid(column=0, row=0)
+        optMenu = OptionMenu(frame, resMethod, *optMethod, command=changeMethod).grid(column=1, row=0)
+
+
+        lbl = Label(frame, text="T").grid(column=0, row=1)
+        lbl = Label(frame, text="T (s)").grid(column=0, row=1)
+        e = Entry(frame, textvariable=T)
+        e.insert(END, self.T)
+        e.grid(column=1, row=1)
+
+        lbl = Label(frame, text="res (iterations/s)").grid(column=0, row=2)
+        e = Entry(frame, textvariable=res)
+        e.insert(END, self.res)
+        e.grid(column=1, row=2)
+
+        lbl = Label(frame, text="Save Rate (in Steps)").grid(column=0, row=3)
+        e = Entry(frame, textvariable=saveRate)
+        e.insert(END, self.saveRate)
+        e.grid(column=1, row=3)
+
+        lbl = Label(frame, text="Mean noise (Hz)").grid(column=0, row=4)
+        e = Entry(frame, textvariable=mean)
+        e.insert(END, self.mean)
+        e.grid(column=1, row=4)
+
+        lbl = Label(frame, text="Std noise (Hz)").grid(column=0, row=5)
+        e = Entry(frame, textvariable=std)
+        e.insert(END, self.std)
+        e.grid(column=1, row=5)
+
+
+        def callbackThresholdWake(std):
+            self.wakeThreshold = float(std.get())
+            print (std.get())
+
+        thresholdWake = StringVar()
+        thresholdWake.trace("w", lambda name, index, mode, thresholdWake=thresholdWake: callbackThresholdWake(thresholdWake))
+
+        lbl = Label(frame, text="threshold Wake").grid(column=0, row=6)
+
+        e = Entry(frame, textvariable=thresholdWake)
+        e.insert(END, self.wakeThreshold)
+        e.grid(column=1, row=6)
+
+
+        def callbackThresholdREM(std):
+            self.REMThreshold = float(std.get())
+            print (std.get())
+
+        thresholdREM = StringVar()
+        thresholdREM.trace("w", lambda name, index, mode, thresholdREM=thresholdREM: callbackThresholdREM(thresholdREM))
+
+        lbl = Label(frame, text="threshold REM").grid(column=0, row=7)
+
+        e = Entry(frame, textvariable=thresholdREM)
+        e.insert(END, self.REMThreshold)
+        e.grid(column=1, row=7)
+
+        return frame
+
 
 
 
@@ -291,12 +405,17 @@ class NetworkGUI:
         window.destroy()
         print(self.results)
 
+
+
     #-----------Display window for the creation of new compartment/connection------------
         
     def addObjToModel(self, network):
+        #window setting
         window = Toplevel()
         window.geometry('800x500')
         window.title("Add object")
+        
+        #choose type of object
         options = ["Neuronal Population", "Homeostatic Sleep Drive", "Connection"]
         var = StringVar()
         Label(window, text="Please choose which type of compartment you want to add :").grid(column=1, row=0)
@@ -304,8 +423,10 @@ class NetworkGUI:
         optMenu.place(x=30, y=30)
         b = Button(window, text="Task completed", command=lambda: window.destroy(),width=25)
         b.place(x=30, y=300)
+        
     def getCreateObjFrame(self, selection, window, optMenu, network):
         frame = Frame (window)
+        
         if selection == "Neuronal Population":
 
             lbl = Label(frame, text="name").grid(column=0, row=0)
@@ -425,7 +546,7 @@ class NetworkGUI:
              
         return frame
 
-    def readAndCreateComp(self,window,valuelist,compType):
+    def readAndCreateComp(self,window,valuelist,compType): #function for creating a new compartment
         compParam = {}
         i = 0
         if compType == "NP":
@@ -446,6 +567,7 @@ class NetworkGUI:
             
         window.destroy()
    
+    
     #------------------------------Injection settings---------------------------------------
 
     def getInjectionCreationWindow(self):
@@ -453,6 +575,7 @@ class NetworkGUI:
         window = Toplevel()
         window.title('Type of injection')
        
+        #create list of connections for option menu
         connAvailable = []
         connAvailableStr = []
         connStr = StringVar()
@@ -461,7 +584,7 @@ class NetworkGUI:
             connStr = new
             print(connStr, "type", type(connStr))
 
-        print(self.compartments)
+       
         for c in self.compartments.keys():
             if c not in self.nlist:
                 for i in self.compartments[c].connections:
@@ -469,6 +592,7 @@ class NetworkGUI:
                         connAvailableStr.append("Injection of: "+str(i.source.neurotransmitter)+" in "+str(i.target.name))
                         connAvailable.append(i)
 
+        #create a new window to display parameters of neurotransmitter selected
         def getName(window, name):
             window.destroy()
             
@@ -478,7 +602,6 @@ class NetworkGUI:
             a = name[14:]
             i = a.index(" ")
             neuro = a[:i]
-            # print(a[:i])
             print(neuro)
             
             injType = StringVar()
@@ -521,7 +644,7 @@ class NetworkGUI:
             e4.insert(END, self.compartments[neuro].imax)
             e4.grid(column=1, row=5)
 
-
+            #add injection with the parameters collected from table
             b = Button(top, text="Create", command=lambda: 
                        [self.addInjection(injType.get(), getConnObject(name), e1.get(), e2.get(), e3.get(), e4.get(), e5.get()),
                         top.destroy()],width=25).grid(column=0, row=6)

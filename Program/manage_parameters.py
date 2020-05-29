@@ -1,6 +1,18 @@
 #!bin/python
 #-*-coding:utf-8-*-
 
+# Program produced by Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz on May 2019
+# based on the article by Costa and his colleagues in 2016
+
+# Program modified by Paul Bielle / Lola Denet / Charles Guinot / Tongyuxuan Hui / Wenli Niu on May 2020 
+# based on the article by Fleshner and his colleagues in 2010
+
+# Supervised by Dr Charlotte Héricé
+
+
+
+#######################parameters extraction########################
+
 def read_parameters(file) :
     ### reads the file parameters.txt and extracts parameters from it
     # returns a list of dictionnaries of dictionnaries : [populations,concentrations,cycles,time]
@@ -11,7 +23,7 @@ def read_parameters(file) :
     populations = {}
     cycles = {}
     simulation_parameters = {}
-    microinjections = {}
+    microinjections = {} #new dictionary for microinjection parameters
 
     connections = {}
 
@@ -19,7 +31,7 @@ def read_parameters(file) :
     check_pop = 0   # check whether you're currently in a population block
     check_cycle = 0   # check whether you're currently in a cycle block
     check_sim = 0   # check whether you're currently in a simulation definition block
-    check_inj = 0
+    check_inj = 0 # check whether you're currently in a neurotransmitter microinjection block
     
     for lines in content :
         line = lines.split(" ")
@@ -82,8 +94,10 @@ def read_parameters(file) :
     fic.close()
     return populations,cycles,simulation_parameters,connections,microinjections
 
-#print(read_parameters("6pop_injections.txt")[4])    or line[0] == "beta" 
 
+
+#######################parameters writing########################
+    
 def write_parameters(name_file,network) :
     ### writes a file with the input parameters
     # creates a file following the same format as default_parameters.txt

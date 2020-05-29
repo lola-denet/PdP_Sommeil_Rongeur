@@ -1,6 +1,16 @@
 #!bin/python
 #-*-coding:utf-8-*-
 
+
+# Program produced by Darnige Eden / Grimaud Arthur / Amelie Gruel / Alexia Kuntz on May 2019
+# based on the article by Costa and his colleagues in 2016
+
+# Program modified by Paul Bielle / Lola Denet / Charles Guinot / Tongyuxuan Hui / Wenli Niu on May 2020 
+# based on the article by Fleshner and his colleagues in 2010
+
+# Supervised by Dr Charlotte Héricé
+
+
 #######################IMPORTATIONS########################
 
 #Calculation
@@ -10,6 +20,7 @@ import math
 from GUI import NetworkGUI
 #Saving data
 import csv
+
 
 ########################NETWORK############################
 #This class is used to manage the simulation              #
@@ -52,7 +63,8 @@ class Network(NetworkGUI):
             self.t = 0
             self.mean = float(args[0]["mean"])
             self.std = float(args[0]["std"])
-       
+           
+        #List contains all names of neurotransmittes possible in micro-injection
         self.nlist = ['GABA_VLPO', 'GABA_SCN', 'acetylcholin_WR', 'acetylcholin_R', 'noradrenaline_LC', 
                       'serotonin_DR', 'noradrenaline', 'acetylcholin', 'GABA']
     #-----------------------------------Noise-----------------------------------#
@@ -74,6 +86,7 @@ class Network(NetworkGUI):
 
     #------------------------------Run simulation----------------------------------#
 
+    #Principle function to run simulation
     def runSim(self):
         self.initResults()
 
@@ -96,7 +109,7 @@ class Network(NetworkGUI):
             self.t = math.floor(self.step/self.res) # current time since simulation time in sc
 
 
-    def nextStepEuler(self): #call Euler next step method in each compartments
+    def nextStepEuler(self): #call Euler next step method in each compartment
         for c in self.compartments.values():
             if isinstance(c, NeuronalPopulation):
                 noise = self.additiveWhiteGaussianNoise()
@@ -104,11 +117,10 @@ class Network(NetworkGUI):
             elif isinstance(c, HomeostaticSleepDrive):
                 c.setNextStepEuler(self.dt, 0)
 
-    def nextStepRK4(self): #call RK4 next step method in each compartments
+    def nextStepRK4(self): #call RK4 next step method in each compartment
         for N in range(4):
             for c in self.compartments.keys():
-                if c not in self.nlist:
-            # for c in self.compartments.values():
+                if c not in self.nlist: #except the compartments of neurotransmitters injected
                     self.compartments[c].setNextSubStepRK4(self.dt,N,self.A[N])
             for i in self.injections:
                 i.setNextSubStepRK4(self.dt,N,self.A[N])
@@ -117,14 +129,13 @@ class Network(NetworkGUI):
             if isinstance(c,NeuronalPopulation):
                 noise = self.additiveWhiteGaussianNoise()
                 c.setNextStepRK4(noise)
-            elif isinstance(c,ParaInjection):
+            elif isinstance(c,ParaInjection): #except the compartments of neurotransmitters injected
                 pass
             else:
                 c.setNextStepRK4()
 
-        for i in self.injections:
+        for i in self.injections: 
             i.setNextStepRK4()
-
 
 
     #-----------------------------Hypnogram--------------------------------------#
@@ -150,6 +161,7 @@ class Network(NetworkGUI):
         else :
             return 1
 
+
     #-------------------------------Write results in file----------------------------------------#
 
     def fileHeader(self) :
@@ -173,30 +185,25 @@ class Network(NetworkGUI):
             self.results.append([header])
             self.headers.append(header)
         for c in self.compartments.keys():
-            if c not in self.nlist:
+            if c not in self.nlist: #except the compartments of neurotransmitters injected
                 for header in self.compartments[c].recorder():
-        # for c in self.compartments.values():
-            # for header in c.recorder():
                     self.results.append([header])
                     self.headers.append(header)
 
-    def getAndSaveRecorders(self): #Call the recorders in each compartements
+    def getAndSaveRecorders(self): #Call the recorders in each compartment
         i=0
         for var in self.headers:
             if var in self.recorder().keys() :
                 self.results[i].append(self.recorder()[var])
                 i+=1
             for c in self.compartments.keys():
-                if c not in self.nlist:
+                if c not in self.nlist: #except the compartments of neurotransmitters injected
                     if var in self.compartments[c].recorder().keys() :
-            # for c in self.compartments.values():
-            #     if var in c.recorder().keys() :
                         self.results[i].append(self.compartments[c].recorder()[var])
                         i+=1
 
     def recorder(self):
         return {'time': self.t, 'hypnogram': self.getHypno()}
-
 
 
     #-------------------------Network modification methods------------------------------#
@@ -207,20 +214,21 @@ class Network(NetworkGUI):
     def addHSD(self, cycleParam): #Add an instance of HomeostaticSleepDrive to the compartments dictionnary
         self.compartments ['HSD'] = HomeostaticSleepDrive(cycleParam)
 
-    def addINJ(self, injParam):
+    def addINJ(self, injParam): #Add an instance of ParaInjection to the compartments dictionnary
         self.compartments [injParam["name"]] = ParaInjection(injParam)
         
-    def addNPConnection(self, type, sourceName, targetName, weight): #Add a connection object to the concerned compartment
-        self.compartments [targetName].connections.append(Connection(type, self.compartments [sourceName],self.compartments [targetName],weight))
+    def addNPConnection(self, conntype, sourceName, targetName, weight): #Add a connection object to the concerned compartment
+        self.compartments [targetName].connections.append(Connection(conntype, self.compartments [sourceName],self.compartments [targetName],weight))
 
-    def addInjection(self, type, connection, P0, TauInj, iMin, iMax, Q0):
-        if type == "Agonist":
+    def addInjection(self, injType, connection, P0, TauInj, iMin, iMax, Q0): #Add an instance of Injection collected form GUI
+        if injType == "Agonist":
             connection.addInjE(Injection(P0, TauInj, iMin, iMax))
             self.injections.append(connection.inj)
-        if type == "Antagonist":
+        if injType == "Antagonist":
             connection.addInjI(Injection(Q0, TauInj, iMin, iMax))
             self.injections.append(connection.inj)
-
+       
+        
     #-------------------------------Debugging methods----------------------------------#
 
     def printAttrType(self,compID): #Print name,value,type of all attributs of a compartment.
@@ -246,22 +254,7 @@ class Network(NetworkGUI):
 
 
 
-class ParaInjection :
-    
-    def __init__(self, myInjection) :
-        self.name = myInjection["name"]
-        self.agoniste = myInjection["agoniste"]
-        self.antagoniste = myInjection["antagoniste"]
-        self.imin = myInjection["imin"]
-        self.imax = myInjection["imax"]
-    
-    def save_parameters(self) :
-        string = "& neurotransmitter = "+self.name+"\n"
-        for parameter in vars(self) :
-            if parameter == 'agoniste' or parameter == 'antagoniste' or parameter == 'imin' or parameter == 'imax' :
-                string += parameter+" = "+str(getattr(self,parameter))+"\n"
-        string += "&\n\n"
-        return string
+
     
 ########################NeuronalPopulation ############################
 #Class representing a neuronal population                             #
@@ -276,8 +269,6 @@ class NeuronalPopulation :
     def __init__(self,myPopulation) :
         self.name = str(myPopulation["name"])
         self.promoting = str(myPopulation["promoting"]) 
-        #List of 'Connection' objects
-
 
         #initial conditions (Variables)
         self.F = [float(myPopulation["F"]),0,0,0,0]
@@ -294,8 +285,8 @@ class NeuronalPopulation :
         self.gamma = float(myPopulation["gamma"])
         self.tau_NT = float(myPopulation["tau_NT"])
         self.connections = []
+        
         #Equation for RK4
-
         # self.dF = RK4(lambda t, y: t*getFR(y))
         # self.dF = RK4(lambda t, y: t*getI(y))
 
@@ -334,7 +325,7 @@ class NeuronalPopulation :
         for c in self.connections:
             if c.type == "NP-NP":
                 result += c.getConnectVal(N)
-        if self.name == "SCN":
+        if self.name == "SCN": #Add the circadian regulation in population SCN
             result += np.sin((2*np.pi*N*dt)/(24*3600))
         return result
 
@@ -361,7 +352,7 @@ class NeuronalPopulation :
 
     def save_parameters(self) :
         string = "* population = "+self.name+"\n"
-        # print(vars(self))
+     
         for parameter in vars(self) :
             if parameter == 'F' or parameter == 'C' :
                 string += parameter+" = "+str(getattr(self,parameter)[0])+"\n"
@@ -524,20 +515,45 @@ class Connection: # creation of the connections class, which manages the connect
 
 
 
+#############################ParaInjection#################################
+#                                                                     #
+#######################################################################
+
+class ParaInjection :
+    #class for saving parameters from model fiche 
+    
+    #cconstructor
+    def __init__(self, myInjection) :
+        self.name = myInjection["name"]#name of neurotransmitter injected
+        self.agoniste = myInjection["agoniste"]#a variable for concentration levels of each agonist 
+        self.antagoniste = myInjection["antagoniste"]#a variable for concentration levels of each antagonist
+        self.imin = myInjection["imin"]#Minimum value for neurotransmitter concentrations
+        self.imax = myInjection["imax"]#maximum value for neurotransmitter concentrations
+    
+    def save_parameters(self) :
+        string = "& neurotransmitter = "+self.name+"\n"
+        for parameter in vars(self) :
+            if parameter == 'agoniste' or parameter == 'antagoniste' or parameter == 'imin' or parameter == 'imax' :
+                string += parameter+" = "+str(getattr(self,parameter))+"\n"
+        string += "&\n\n"
+        return string
+    
+   
+       
 #############################Injection#################################
 #                                                                     #
 #######################################################################
 
-
 class Injection:
-
+#class for implementing a simulation of neurotransmitter micro-injection 
+    
     def __init__(self, P, tauPi, iMin, iMax) :
-        self.P = [P,0,0,0,0]
-        self.tauPi = tauPi #Au
-        self.iMin = iMin #Au
-        self.imax = iMax #Au
+        self.P = [float(P),0,0,0,0]
+        self.tauPi = float(tauPi) #variable for agonist or antagonist
+        self.iMin = float(iMin) #Minimum value for neurotransmitter concentrations
+        self.imax = float(iMax) #maximum value for neurotransmitter concentrations
         
-    def getP(self,N):
+    def getP(self, N):
         return -(self.P[N]/self.tauPi)
 
     def getMi(self):
@@ -546,12 +562,12 @@ class Injection:
         else:
             return 1 - (self.P[0] - self.iMin)/(self.iMax - self.iMin)
         
-    def setNextSubStepRK4(self,dt,N,coef):
+    def setNextSubStepRK4(self, dt, N, coef):
         self.P[N+1] = self.P[0] + coef * dt * self.getP(N)
 
     def setNextStepRK4(self):
         self.P[0] = (-3*self.P[0] + 2*self.P[1] + 4*self.P[2] + 2*self.P[3] + self.P[4])/6
         
-    def setNextStepEuler(self,dt,N, noise):
+    def setNextStepEuler(self, dt, N, noise):
         self.P[0]  = self.P[0] + dt * self.getP(N) + noise
         
